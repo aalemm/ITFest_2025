@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload & Visualize Data</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+
+    <div class="max-w-3xl mx-auto space-y-6">
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+            <h2 class="text-2xl font-bold mb-4">Upload Audio File</h2>
+            <form id="audioForm" enctype="multipart/form-data" class="space-y-3">
+                <input type="file" id="audioInput" name="audio" accept=".mp3, .wav" class="border p-2 w-full rounded">
+                <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Upload</button>
+            </form>
+            <p id="audioMessage" class="mt-2 text-green-600"></p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+            <h2 class="text-2xl font-bold mb-4">Upload JSON File</h2>
+            <form id="jsonForm" enctype="multipart/form-data" class="space-y-3">
+                <input type="file" id="jsonInput" name="jsonfile" accept=".json" class="border p-2 w-full rounded">
+                <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Upload</button>
+            </form>
+            <p id="jsonMessage" class="mt-2 text-green-600"></p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+            <h2 class="text-2xl font-bold mb-4">Generated Charts</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <h3 class="text-lg font-semibold">Pie Chart</h3>
+                    <img id="pieChart" src="" class="mt-2 hidden w-full rounded-lg shadow-md">
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold">Bar Chart</h3>
+                    <img id="barChart" src="" class="mt-2 hidden w-full rounded-lg shadow-md">
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold">Line Chart</h3>
+                    <img id="lineChart" src="" class="mt-2 hidden w-full rounded-lg shadow-md">
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+            <h2 class="text-2xl font-bold mb-4">Disease Information</h2>
+            <div id="diseaseInfo" class="text-left space-y-4">
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur ut ligula nec libero suscipit consequat.</p>
+                <p>Suspendisse potenti. Proin eu magna id sapien faucibus suscipit.</p>
+                <p>Donec non justo non purus gravida mollis at non purus.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("audioForm").onsubmit = async function (event) {
+            event.preventDefault();
+            let formData = new FormData();
+            formData.append("audio", document.getElementById("audioInput").files[0]);
+            let response = await fetch("/upload_audio", { method: "POST", body: formData });
+            let result = await response.json();
+            document.getElementById("audioMessage").innerText = result.message || result.error;
+        };
+
+        document.getElementById("jsonForm").onsubmit = async function (event) {
+            event.preventDefault();
+            let formData = new FormData();
+            formData.append("jsonfile", document.getElementById("jsonInput").files[0]);
+            let response = await fetch("/upload_json", { method: "POST", body: formData });
+            let result = await response.json();
+            document.getElementById("jsonMessage").innerText = result.message || result.error;
+
+            if (result.pie_chart) {
+                document.getElementById("pieChart").src = result.pie_chart;
+                document.getElementById("pieChart").classList.remove("hidden");
+            }
+            if (result.bar_chart) {
+                document.getElementById("barChart").src = result.bar_chart;
+                document.getElementById("barChart").classList.remove("hidden");
+            }
+            if (result.line_chart) {
+                document.getElementById("lineChart").src = result.line_chart;
+                document.getElementById("lineChart").classList.remove("hidden");
+            }
+        };
+    </script>
+
+</body>
+</html>
